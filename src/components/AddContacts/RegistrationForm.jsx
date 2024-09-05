@@ -1,11 +1,16 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import contactIcon from '../icons/address-book-regular.svg';
 
 export default function RegistrationForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null); //create mutable variable helps to not re-render the compoment
+  const nameInputRef = useRef(null); 
+
+  
+  
   const [formData, setFormData] = useState({
     oldEmail: '',
     name: '',
@@ -78,10 +83,27 @@ export default function RegistrationForm() {
   
       console.log(res);
       if (res.data.Message === 'Contact saved successfully') {
-        window.location.reload();
         alert('Contact saved');
-        
-      } else {
+        setFormData({
+          oldEmail: '',
+          name: '',
+          phone: '',
+          email: '',
+          address: '',
+          designation: '',
+          image: null,
+        });
+        if (fileInputRef.current) {
+      
+          fileInputRef.current.value = null; // Reset file input
+        }
+        if(nameInputRef)
+        {
+          nameInputRef.current.focus(); // after save data cursor focus on name field
+        }
+       
+      }
+       else {
         navigate('/ViewContact');
       }
     } catch (error) {
@@ -103,7 +125,7 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="max-w-md border-2 mx-auto my-5 p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-md f border-2 mx-auto my-5 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-xl font-bold text-center mb-4 text-gray-700">
         {location.state && location.state.contact ? 'Update Contact' : 'Add Contact'}
       </h2>
@@ -114,6 +136,7 @@ export default function RegistrationForm() {
             type="text"
             name="name"
             value={formData.name}
+            ref={nameInputRef}
             onChange={handleChange}
             required
             className="mt-1 block w-full p-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -173,6 +196,7 @@ export default function RegistrationForm() {
           <input
             type="file"
             accept="image/*"
+            ref={fileInputRef}
             onChange={handleImageChange}
             className="mt-1 block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
