@@ -7,14 +7,11 @@ export default function ViewContacts() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-   
-    // console.log('Fetching contacts');
-    
     const fetchContacts = async () => {
       try {
         const response = await axios.get('http://localhost:8081/data/fetchData', { withCredentials: true });
-        console.log('Fetched contacts:', response.data[0]); // we write this because store procedure data returns in this formate [[our data ],[extra data]]
-        if (Array.isArray(response.data[0])) {              // our data present at index 0 in response.data array
+        console.log('Fetched contacts:', response.data[0]);
+        if (Array.isArray(response.data[0])) {
           setContacts(response.data[0]);
         } else {
           console.error('Unexpected data format:', response.data);
@@ -27,9 +24,13 @@ export default function ViewContacts() {
     fetchContacts();
   }, []);
 
-  // Filtering contacts based on search query
+  const handleDeleteContact = (deletedContactId) => {
+    setContacts((prevContacts) => prevContacts.filter(contact => contact.contact_id !== deletedContactId));
+  };
+
   const filteredContacts = contacts.filter((contact) =>
-     contact.name.toLowerCase().includes(searchQuery.toLowerCase()));  //We get data from useState and filter it
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="container mx-auto px-4 py-6 min-h-screen">
@@ -47,15 +48,15 @@ export default function ViewContacts() {
         </button>
 
         <button onClick={() => window.location.href = '/AddContacts'}  
-        className='text-white px-4 bg-slate-400  rounded-lg hover:bg-slate-500 transition-colors ml-4'>
-        
+        className='text-white px-4 bg-slate-400 rounded-lg hover:bg-slate-500 transition-colors ml-4'>
            Add
         </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid gap-6"
+     style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
         {filteredContacts.length > 0 ? (
           filteredContacts.map((contact, index) => (
-            <ContactCard key={index} contact={contact} />
+            <ContactCard key={index} contact={contact} onDelete={handleDeleteContact} />
           ))
         ) : (
           <p className="text-center">No contacts found.</p>
