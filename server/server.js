@@ -23,8 +23,9 @@ app.use(
   })
 );
 
+
 // Register route
-app.post("/register", async (req, res) => {
+app.post("/register", async  (req, res) => {
   const sql = "CALL RegisterUser(?, ?, ?)";
   
   try {
@@ -58,17 +59,17 @@ app.post("/login", async (req, res) => {
         return res.json({ Status: "Success" });
       } 
       else {
-        logger.warn(`User not logged in password incorrect`);
-        return res.json({ Error: "Password is incorrect or not matched" });
+        logger.warn(`Login attempt with incorrect password for email: ${req.body.email}`);
       }
      } 
     else {
      logger.warn(`Login attempt for non-existent email: ${req.body.email}`);
-      return res.json({ Error: "No Email Existed" });
     }
+
+    return res.json({ Error: "Invalid email or password" });
   } catch (err) {
     logger.error(`Error logging in: ${err.message}`);
-    return res.json({ Error: "Error logging in server", Details: err.message });
+    return res.json({ Error: "Server Error", Details: err.message }); 
   }
 });
 
@@ -93,7 +94,7 @@ const verifyUser = (req, res, next) => {
   });
 };
 
-// Protected route
+// Protected route 
 app.get("/", verifyUser, (req, res) => {
   logger.info(`User accessed protected route: ${req.email}`);
   return res.json({ Status: "Success", name: req.name, email: req.email });
@@ -107,6 +108,7 @@ app.get("/logout", (req, res) => {
 });
 
 app.use('/data', verifyUser, dataRoutes);
+
 app.use('/uploads', express.static('./uploads')); // ./uploads is a file where serve images 
 
 app.use("/mail",mailRoutes);
