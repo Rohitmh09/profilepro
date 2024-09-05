@@ -1,30 +1,37 @@
 import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
+import DailyRotateFile from 'winston-daily-rotate-file';  // allow to delete log after certain time span (e.g: 14d)
 
-// Define the log file path
+// Define the log file directory
 const logDirectory = path.join(path.resolve(), 'logs');
-const logFilePath = path.join(logDirectory, 'application.log');
 
-
+// Ensure the logs directory exists
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory);
 }
 
-// Create a logger instance
+// Configure daily rotation and automatic deletion
+const transport = new DailyRotateFile({
+  dirname: logDirectory,
+  filename: 'application-%DATE%.log',
+  datePattern: 'YYYY-MM-DD', // Rotate logs daily
+  maxFiles: '14d', // Retain logs for 14 days, then delete
+  zippedArchive: true, // Compress older logs to save space
+});
+
+// Create a logger instance with rotating file transport
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.json()
+    winston.format.json() // Log in JSON format with timestamp
   ),
   transports: [
     new winston.transports.Console({
-      format: winston.format.simple(),
+      format: winston.format.simple(), // Print to console in a readable format
     }),
-    new winston.transports.File({
-      filename: logFilePath,
-    }),
+    transport, // Rotate logs automatically and delete old logs
   ],
 });
 
