@@ -126,12 +126,11 @@ export default function Register() {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Already a member?{" "}
-            <a
-              href="/login"
+            <div onClick={() => navigate("/login")}
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Sign in
-            </a>
+            </div>
           </p>
         </div>
       </div>
