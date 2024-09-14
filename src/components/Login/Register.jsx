@@ -124,12 +124,12 @@ export default function Register() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already a member?{" "}
+         <p className="mt-6 text-center text-sm text-gray-500 flex justify-center">
+            Already a member? 
             <div onClick={() => navigate("/login")}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Sign in
+              className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+            > 
+               Sign in
             </div>
           </p>
         </div>
